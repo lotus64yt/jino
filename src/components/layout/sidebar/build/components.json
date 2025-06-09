@@ -1,0 +1,412 @@
+[
+  {
+    "category": "Contrôle",
+    "items": [
+      {
+        "id": "if",
+        "name": "Si (Condition)",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "dataIns": [
+            { "portId": "condition", "name": "Condition", "dataType": "boolean", "kind": "data", "flow": "in" }
+          ],
+          "executionOuts": [
+            { "portId": "exec_out_then", "name": "Alors", "dataType": "execution", "kind": "execution", "flow": "out", "color": "green" },
+            { "portId": "exec_out_else", "name": "Sinon", "dataType": "execution", "kind": "execution", "flow": "out", "color": "red" }
+          ]
+        },
+        "documentation": "Exécute la branche 'Alors' si la condition est vraie, sinon exécute la branche 'Sinon'. La condition doit être une valeur booléenne (vrai/faux)."
+      },
+      {
+        "id": "while",
+        "name": "Tant que",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "dataIns": [
+            { "portId": "condition", "name": "Condition", "dataType": "boolean", "kind": "data", "flow": "in" }
+          ],
+          "executionOuts": [
+            { "portId": "exec_out_loop", "name": "Boucle", "dataType": "execution", "kind": "execution", "flow": "out" },
+            { "portId": "exec_out_end", "name": "Fin", "dataType": "execution", "kind": "execution", "flow": "out" }
+          ]
+        },
+        "documentation": "Exécute la branche 'Boucle' tant que la condition (entrée booléenne) est vraie. Lorsque la condition devient fausse, l'exécution continue par la branche 'Fin'."
+      },
+      {
+        "id": "loop_fixed",
+        "name": "Répéter X fois",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "dataIns": [
+            { "portId": "iterations", "name": "Fois", "dataType": "number", "kind": "data", "flow": "in" }
+          ],
+          "executionOuts": [
+            { "portId": "exec_out_loop", "name": "Boucle", "dataType": "execution", "kind": "execution", "flow": "out" },
+            { "portId": "exec_out_end", "name": "Fin", "dataType": "execution", "kind": "execution", "flow": "out" }
+          ]
+        },
+        "documentation": "Répète l'exécution de la branche 'Boucle' un nombre de fois spécifié par l'entrée 'Fois'. L'exécution continue ensuite par la branche 'Fin'."
+      },
+      {
+        "id": "loop_array_foreach",
+        "name": "Pour Chaque Dans Tableau",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "dataIns": [
+            { "portId": "array_in", "name": "Tableau", "dataType": "array", "kind": "data", "flow": "in" }
+          ],
+          "executionOuts": [
+            {
+              "portId": "exec_out_loop",
+              "name": "Boucle (Élément)",
+              "dataType": "execution",
+              "kind": "execution",
+              "flow": "out",
+              "providesData": [
+                { "portId": "element", "name": "Élément", "dataType": "any", "kind": "data", "flow": "out" },
+                { "portId": "index", "name": "Index", "dataType": "number", "kind": "data", "flow": "out" }
+              ]
+            },
+            { "portId": "exec_out_end", "name": "Fin", "dataType": "execution", "kind": "execution", "flow": "out" }
+          ]
+        },
+        "documentation": "Itère sur chaque élément d'un tableau. Fournit l'élément courant et son index à chaque itération de la boucle. La branche 'Fin' s'exécute après que tous les éléments ont été traités."
+      }
+    ]
+  },
+  {
+    "category": "Entrées",
+    "items": [
+      {
+        "id": "button_read",
+        "name": "Lire un Pin (Numérique)",
+        "defaultPorts": {
+          "dataOuts": [
+            { "portId": "state", "name": "État", "dataType": "boolean", "kind": "data", "flow": "out" }
+          ],
+          "dataIns": [
+            { "portId": "pin", "name": "Pin", "dataType": "number", "kind": "data", "flow": "in" }
+          ]
+        },
+        "documentation": "Lit l'état (HAUT ou BAS) d'un pin numérique. Fournit une valeur booléenne (vrai si HAUT, faux si BAS)."
+      },
+      {
+        "id": "sensor_read",
+        "name": "Lire un Pin (Analogique)",
+        "defaultPorts": {
+          "dataOuts": [
+            { "portId": "value", "name": "Valeur", "dataType": "number", "kind": "data", "flow": "out" }
+          ],
+           "dataIns": [
+            { "portId": "pin", "name": "Pin", "dataType": "number", "kind": "data", "flow": "in" }
+          ]
+        },
+        "documentation": "Lit la valeur analogique d'un pin (typiquement de 0 à 1023). Fournit une valeur numérique."
+      },
+      {
+        "id": "sensor_digital_read",
+        "name": "Lire un Pin (Numérique Direct)",
+        "defaultPorts": {
+          "dataOuts": [
+            { "portId": "value", "name": "Valeur", "dataType": "boolean", "kind": "data", "flow": "out" }
+          ],
+          "dataIns": [
+            { "portId": "pin", "name": "Pin", "dataType": "number", "kind": "data", "flow": "in" }
+          ]
+        },
+        "documentation": "Lit l'état numérique direct (HAUT/BAS) d'un pin. Similaire à 'Lire un Pin (Numérique)' mais peut être utilisé pour des capteurs numériques spécifiques. Fournit une valeur booléenne."
+      }
+    ]
+  },
+  {
+    "category": "Sorties",
+    "items": [
+      {
+        "id": "led_on",
+        "name": "Allumer un Pin (HAUT)",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "executionOuts": [{ "portId": "exec_out", "name": "Out", "dataType": "execution", "kind": "execution", "flow": "out" }],
+          "dataIns": [
+            { "portId": "pin", "name": "Pin", "dataType": "number", "kind": "data", "flow": "in" }
+          ]
+        },
+        "documentation": "Met un pin numérique à l'état HAUT (typiquement pour allumer une LED ou activer un composant)."
+      },
+      {
+        "id": "led_off",
+        "name": "Éteindre un Pin (BAS)",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "executionOuts": [{ "portId": "exec_out", "name": "Out", "dataType": "execution", "kind": "execution", "flow": "out" }],
+          "dataIns": [
+            { "portId": "pin", "name": "Pin", "dataType": "number", "kind": "data", "flow": "in" }
+          ]
+        },
+        "documentation": "Met un pin numérique à l'état BAS (typiquement pour éteindre une LED ou désactiver un composant)."
+      },
+      {
+        "id": "set_pin_state",
+        "name": "Définir État Pin",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "executionOuts": [{ "portId": "exec_out", "name": "Out", "dataType": "execution", "kind": "execution", "flow": "out" }],
+          "dataIns": [
+            { "portId": "pin", "name": "Pin", "dataType": "number", "kind": "data", "flow": "in" },
+            { "portId": "state", "name": "État", "dataType": "boolean", "kind": "data", "flow": "in" }
+          ]
+        },
+        "documentation": "Définit l'état (HAUT ou BAS) d'un pin numérique en fonction d'une entrée booléenne (vrai pour HAUT, faux pour BAS)."
+      },
+      {
+        "id": "buzzer_play",
+        "name": "Jouer Son (Buzzer)",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "executionOuts": [{ "portId": "exec_out", "name": "Out", "dataType": "execution", "kind": "execution", "flow": "out" }],
+          "dataIns": [
+            { "portId": "pin", "name": "Pin", "dataType": "number", "kind": "data", "flow": "in" },
+            { "portId": "frequency", "name": "Fréquence", "dataType": "number", "kind": "data", "flow": "in" },
+            { "portId": "duration", "name": "Durée", "dataType": "number", "kind": "data", "flow": "in" }
+          ]
+        },
+        "documentation": "Active un buzzer connecté à un pin, en jouant un son à une fréquence et pour une durée spécifiées."
+      }
+    ]
+  },
+  {
+    "category": "Math / Logique",
+    "items": [
+      {
+        "id": "math_operation",
+        "name": "Opération Mathématique",
+        "defaultPorts": {
+          "dataIns": [
+            { "portId": "operand_a", "name": "A", "dataType": "number", "kind": "data", "flow": "in" },
+            { "portId": "operand_b", "name": "B", "dataType": "number", "kind": "data", "flow": "in" }
+          ],
+          "dataOuts": [
+            { "portId": "result", "name": "Résultat", "dataType": "number", "kind": "data", "flow": "out" }
+          ]
+        },
+        "documentation": "Effectue une opération mathématique (addition, soustraction, etc. - configurable) entre deux nombres A et B. Fournit le résultat."
+      },
+      {
+        "id": "logic_operation",
+        "name": "Opération Logique",
+        "defaultPorts": {
+          "dataIns": [
+            { "portId": "operand_a", "name": "A", "dataType": "boolean", "kind": "data", "flow": "in" },
+            { "portId": "operand_b", "name": "B", "dataType": "boolean", "kind": "data", "flow": "in" }
+          ],
+          "dataOuts": [
+            { "portId": "result", "name": "Résultat", "dataType": "boolean", "kind": "data", "flow": "out" }
+          ]
+        },
+        "configComponent": "LogicOperationConfig",
+        "defaultConfig": {
+          "operator": "AND",
+          "numInputs": 2
+        },
+        "documentation": "Effectue une opération logique (ET, OU, NON, etc. - configurable). Le nombre d'entrées est dynamique pour ET, OU, XOR. NON a toujours 1 entrée. Fournit le résultat booléen."
+      },
+      { "id": "random_number", "name": "Nombre Aléatoire",
+        "defaultPorts": {
+          "dataIns": [
+            { "portId": "min", "name": "Min", "dataType": "number", "kind": "data", "flow": "in" },
+            { "portId": "max", "name": "Max", "dataType": "number", "kind": "data", "flow": "in" }
+          ],
+          "dataOuts": [
+            { "portId": "value", "name": "Valeur", "dataType": "number", "kind": "data", "flow": "out" }
+          ]
+        },
+        "documentation": "Génère un nombre aléatoire entre une valeur minimale (Min) et maximale (Max) incluses. Fournit le nombre généré."
+      },
+      {
+        "id": "variable_set",
+        "name": "Définir Variable",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "executionOuts": [{ "portId": "exec_out", "name": "Out", "dataType": "execution", "kind": "execution", "flow": "out" }],
+          "dataIns": [
+            { "portId": "value_in", "name": "Valeur", "dataType": "any", "kind": "data", "flow": "in" }
+          ]
+        },
+        "configComponent": "VariableNameConfig",
+        "defaultConfig": { "name": "maVariable", "isNew": true, "dataType": "Nombre"},
+        "documentation": "Définit la valeur d'une variable (nom et type configurables). Le port d'entrée 'Valeur' s'adapte au type de la variable."
+      },
+      {
+        "id": "variable_get",
+        "name": "Lire Variable",
+        "defaultPorts": {
+          "dataOuts": [
+            { "portId": "value_out", "name": "Valeur", "dataType": "any", "kind": "data", "flow": "out" }
+          ]
+        },
+        "configComponent": "VariableNameConfig",
+        "defaultConfig": { "name": "maVariable", "dataType": "Nombre" },
+        "documentation": "Lit la valeur d'une variable (nom configurable). Le port de sortie 'Valeur' s'adapte au type de la variable."
+      }
+    ]
+  },
+  {
+    "category": "Timers",
+    "items": [
+      {
+        "id": "delay",
+        "name": "Attendre (ms)",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "executionOuts": [{ "portId": "exec_out", "name": "Out", "dataType": "execution", "kind": "execution", "flow": "out" }],
+          "dataIns": [
+            { "portId": "duration", "name": "Durée", "dataType": "number", "kind": "data", "flow": "in" }
+          ]
+        },
+        "documentation": "Met en pause l'exécution du programme pour la durée spécifiée en millisecondes. La durée peut être configurée ou fournie par une entrée de données."
+      },
+      {
+        "id": "interval_run",
+        "name": "Exécuter à Intervalle",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in", "name": "In", "dataType": "execution", "kind": "execution", "flow": "in" },
+          "dataIns": [
+            { "portId": "interval", "name": "Intervalle (ms)", "dataType": "number", "kind": "data", "flow": "in" }
+          ],
+          "executionOuts": [
+            { "portId": "exec_out_tick", "name": "Tick", "dataType": "execution", "kind": "execution", "flow": "out" },
+            { "portId": "exec_out_done", "name": "Arrêté", "dataType": "execution", "kind": "execution", "flow": "out" }
+          ]
+        },
+        "documentation": "Exécute la branche 'Tick' à intervalles réguliers définis par 'Intervalle (ms)'. La branche 'Arrêté' s'exécute si l'intervalle est stoppé (fonctionnalité avancée)."
+      },
+      {
+        "id": "get_time",
+        "name": "Temps Écoulé (ms)",
+        "defaultPorts": {
+          "dataOuts": [
+            { "portId": "time_ms", "name": "ms", "dataType": "number", "kind": "data", "flow": "out" }
+          ]
+        },
+        "documentation": "Fournit le temps écoulé en millisecondes depuis le démarrage du programme Arduino (valeur de millis())."
+      }
+    ]
+  },
+  {
+    "category": "Valeurs Constantes",
+    "items": [
+      {
+        "id": "constant_number",
+        "name": "Nombre Constant",
+        "defaultPorts": {
+          "dataOuts": [
+            { "portId": "value", "name": "Valeur", "dataType": "number", "kind": "data", "flow": "out" }
+          ]
+        },
+        "documentation": "Fournit une valeur numérique constante. Configurez la valeur dans les paramètres du bloc."
+      },
+      {
+        "id": "constant_string",
+        "name": "Texte Constant",
+        "defaultPorts": {
+          "dataOuts": [
+            { "portId": "value", "name": "Texte", "dataType": "string", "kind": "data", "flow": "out" }
+          ]
+        },
+        "documentation": "Fournit une chaîne de caractères constante. Configurez le texte dans les paramètres du bloc."
+      },
+      {
+        "id": "constant_boolean",
+        "name": "Booléen Constant",
+        "defaultPorts": {
+          "dataOuts": [
+            { "portId": "value", "name": "État", "dataType": "boolean", "kind": "data", "flow": "out" }
+          ]
+        },
+        "documentation": "Fournit une valeur booléenne constante (vrai ou faux). Configurez la valeur dans les paramètres du bloc."
+      },
+      {
+        "id": "constant_array",
+        "name": "Tableau Constant",
+        "defaultPorts": {
+          "dataOuts": [
+            { "portId": "value", "name": "Tableau", "dataType": "array", "kind": "data", "flow": "out" }
+          ]
+        },
+        "documentation": "Fournit un tableau constant. Configurez les éléments du tableau dans les paramètres du bloc."
+      }
+    ]
+  },
+  {
+    "category": "Programme",
+    "items": [
+      {
+        "id": "program_setup_start",
+        "name": "Début setup",
+        "defaultPorts": {
+          "executionOuts": [{ "portId": "exec_out_setup", "name": "Setup", "dataType": "execution", "kind": "execution", "flow": "out" }]
+        },
+        "documentation": "Marque le début de la section de configuration (setup) du programme Arduino. Le code connecté ici s'exécute une seule fois au démarrage."
+      },
+      {
+        "id": "program_setup_end",
+        "name": "Fin Setup",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in_setup_end", "name": "Fin Setup In", "dataType": "execution", "kind": "execution", "flow": "in" }
+        },
+        "documentation": "Marque la fin de la section de configuration (setup). Doit être connecté après la dernière action du setup."
+      },
+      {
+        "id": "program_loop_start",
+        "name": "Début Loop",
+        "defaultPorts": {
+          "executionOuts": [{ "portId": "exec_out_loop", "name": "Loop", "dataType": "execution", "kind": "execution", "flow": "out" }]
+        },
+        "documentation": "Marque le début de la boucle principale (loop) du programme Arduino. Le code connecté ici s'exécute en continu."
+      },
+      {
+        "id": "program_loop_end",
+        "name": "Fin Loop",
+        "defaultPorts": {
+          "executionIn": { "portId": "exec_in_loop_end", "name": "Fin Loop In", "dataType": "execution", "kind": "execution", "flow": "in" }
+        },
+        "documentation": "Marque la fin d'une itération de la boucle principale (loop). L'exécution retourne ensuite au 'Début Loop'."
+      }
+    ]
+  },
+  {
+    "category": "Fonctions",
+    "items": [
+      {
+        "id": "function_definition_start",
+        "name": "Définir Fonction",
+        "defaultPorts": {
+          "executionOuts": [
+            { 
+              "portId": "exec_out_body", 
+              "name": "Corps de la fonction", 
+              "dataType": "execution", 
+              "kind": "execution", 
+              "flow": "out"
+            }
+          ]
+        },
+        "documentation": "Définit le début d'une nouvelle fonction. Configurez son nom et ses paramètres (entrées/sorties) dans les options du bloc. Le corps de la fonction est la séquence de blocs connectée à sa sortie d'exécution."
+      },
+      {
+        "id": "function_definition_end",
+        "name": "Fin Fonction",
+        "defaultPorts": {
+          "executionIn": { 
+            "portId": "exec_in_end", 
+            "name": "Retour", 
+            "dataType": "execution", 
+            "kind": "execution", 
+            "flow": "in" 
+          }
+        },
+        "documentation": "Marque la fin d'une définition de fonction. Doit être connecté après la dernière action du corps de la fonction."
+      }
+    ]
+  }
+]

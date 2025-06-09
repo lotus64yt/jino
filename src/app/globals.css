@@ -1,26 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #111827; /* Dark Gray */
+  --foreground: #F3F4F6; /* Light Gray */
+  --primary: #2563EB;    /* Deep Blue */
+  --secondary: #06B6D4;  /* Vibrant Cyan */
+  --muted-bg: #1F2937;   /* Slightly Lighter Dark Gray for subtle backgrounds */
+  --card-bg: #1F2937; /* Card background */
+  --card-border: #374151; /* Card border */
+  --input-bg: #374151; /* Input background */
+  --input-border: #4B5563; /* Input border */
+  --button-primary-bg: var(--primary);
+  --button-primary-text: var(--foreground);
+  --button-secondary-bg: var(--secondary);
+  --button-secondary-text: #064E3B; /* Darker text for better contrast on cyan */
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* A slightly more modern font stack */
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animated-dots-bg {
+    background-color: #111827; /* Darker gray, e.g., gray-900 */
+    background-image: radial-gradient(circle, #374151 0.5px, transparent 0.5px); /* gray-700 dots, smaller */
+    background-size: 20px 20px; /* Spacing of dots */
+    animation: pan-background 60s linear infinite;
+  }
+
+  @keyframes pan-background {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 200px 200px; /* Controls how far it pans, creating a slower, more subtle effect */
+    }
+  }
 }

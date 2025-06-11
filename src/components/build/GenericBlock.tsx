@@ -118,7 +118,7 @@ const GenericBlock: React.FC<GenericBlockProps> = ({
     <div
       data-block-id={blockId}
       data-instance-id={instanceId}
-      className="relative p-4 w-full h-full bg-white text-blue-700 border-2 border-blue-500 rounded-lg shadow-md hover:border-blue-700 transition-colors flex flex-col justify-center items-center select-none"
+      className="relative p-4 w-full h-full bg-white text-blue-700 border-2 border-blue-500 rounded-lg shadow-md hover:border-blue-700 transition transform duration-200 ease-in-out hover:scale-105 hover:shadow-xl flex flex-col justify-center items-center select-none"
     >
       {/* Configuration Button (Top-Left) */}
       {onOpenConfiguration && (

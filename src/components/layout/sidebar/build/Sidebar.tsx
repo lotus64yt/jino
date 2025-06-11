@@ -96,7 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ /*components: baseComponents,*/ defin
                 key={component.id}
                 draggable
                 onDragStart={(e) => handleDragStart(e, component)}
-                className="p-2 mb-2 bg-gray-700 rounded cursor-grab hover:bg-gray-600 transition-colors"
+                className="p-2 mb-2 bg-gray-700 rounded cursor-grab hover:bg-gray-600 transition transform duration-200 ease-in-out hover:scale-105 hover:shadow-lg"
               >
                 {component.name}
               </div>

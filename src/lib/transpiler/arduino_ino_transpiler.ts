@@ -239,7 +239,7 @@ function collectPinModes(project: JinoProject, options: TranspilationOptions): M
       return undefined;
     };
 
-    switch (block.id) { // Changed from block.componentId to block.id
+    switch (block.id) {
       case 'led_on':
       case 'led_off':
       case 'set_pin_state':
@@ -278,9 +278,9 @@ function transpileExecutionSequence(
   const visitedBlocks = new Set<string>();
 
   while (currentBlock) {
-    if (options.style === 'natural') {
-      sequenceCode += `${indentation}// Block: ${currentBlock.name} (ID: ${currentBlock.instanceId}, Type: ${currentBlock.id})\n`;
-    }
+    // if (options.style === 'natural') {
+    //   sequenceCode += `${indentation}// Block: ${currentBlock.name} (ID: ${currentBlock.instanceId}, Type: ${currentBlock.id})\n`;
+    // }
     let blockSpecificCodeGenerated = false;
     switch (currentBlock.id) {
       case 'program_setup_end':
@@ -306,10 +306,14 @@ function transpileExecutionSequence(
         sequenceCode += `${indentation}delay(${getInputValueCode(project, currentBlock.instanceId, 'duration', options)});\n`;
         break;
       case 'millis_delay':
-        // Temporisation non bloquante
         sequenceCode += `${indentation}static unsigned long __lastMillis_${currentBlock.instanceId} = 0;\n`;
         sequenceCode += `${indentation}if (millis() - __lastMillis_${currentBlock.instanceId} >= ${getInputValueCode(project, currentBlock.instanceId, 'duration', options)}) {\n`;
         sequenceCode += `${indentation}  __lastMillis_${currentBlock.instanceId} = millis();\n`;
+        break;
+      case "buzzer_play":
+        sequenceCode += `${indentation}tone(${getInputValueCode(project, currentBlock.instanceId, 'pin', options)}, ${getInputValueCode(project, currentBlock.instanceId, 'frequency', options)});\n`;
+        sequenceCode += `${indentation}delay(${getInputValueCode(project, currentBlock.instanceId, 'duration', options)});\n`;
+        sequenceCode += `${indentation}noTone(${getInputValueCode(project, currentBlock.instanceId, 'pin', options)});\n`;
         break;
       case 'serial_print':
         sequenceCode += `${indentation}Serial.print(${getInputValueCode(project, currentBlock.instanceId, 'value', options)});\n`;

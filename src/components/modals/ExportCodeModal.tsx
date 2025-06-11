@@ -1,27 +1,31 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 interface ExportCodeModalProps {
   isOpen: boolean;
   onClose: () => void;
   // onExport now returns a Promise<string | null> (download URL or null on error)
-  onExport: (options: { language: string; style: 'natural' | 'compressed' }) => Promise<string | null>;
+  onExport: (options: {
+    language: string;
+    style: "natural" | "compressed";
+  }) => Promise<string | null>;
 }
 
-
-const ExportCodeModal: React.FC<ExportCodeModalProps> = ({ isOpen, onClose, onExport }) => {
-  const [language, setLanguage] = useState<string>('.ino'); // Default and only option for now
-  const [style, setStyle] = useState<'natural' | 'compressed'>('natural');
+const ExportCodeModal: React.FC<ExportCodeModalProps> = ({
+  isOpen,
+  onClose,
+  onExport,
+}) => {
+  const [language, setLanguage] = useState<string>(".ino");
+  const [style, setStyle] = useState<"natural" | "compressed">("natural");
   const [isLoading, setIsLoading] = useState(false);
-  const [exportCompleted, setExportCompleted] = useState(false);
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [exportMessage, setExportMessage] = useState<string | null>(null); // To store success or error message
 
   useEffect(() => {
     if (isOpen) {
       setIsLoading(false);
-      setExportCompleted(false);
-      setDownloadUrl(null);
+      setExportMessage(null); // Reset message when modal opens
     }
   }, [isOpen]);
 
@@ -31,63 +35,75 @@ const ExportCodeModal: React.FC<ExportCodeModalProps> = ({ isOpen, onClose, onEx
 
   const handleExportClick = async () => {
     setIsLoading(true);
-    setExportCompleted(false);
-    setDownloadUrl(null);
+    setExportMessage(null);
     try {
-      const url = await onExport({ language, style });
-      setDownloadUrl(url || null);
-      setExportCompleted(true);
-    } catch /*(e)*/ {
-      setDownloadUrl(null);
-      setExportCompleted(true);
+      const resultMessage = await onExport({ language, style });
+      if (resultMessage) {
+        setExportMessage(resultMessage); // Display success message from onExport
+      } else {
+        setExportMessage(
+          "Erreur lors de l'exportation. Le nom du fichier n'a pas été fourni ou une autre erreur est survenue."
+        );
+      }
+    } catch (error) {
+      console.error("Export failed in modal:", error);
+      setExportMessage(
+        "Erreur critique lors de l'exportation: " + (error as Error).message
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDownload = () => {
-    if (downloadUrl) {
-      // For blob URLs or direct links
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = 'export.ino';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-      <div className="bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md">
-        <h2 className="text-xl font-semibold text-white mb-4">Options d&apos;Exportation du Code</h2>
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-4 text-black">
+      <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full z-50 flex flex-col">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Options d&apos;Exportation du Code
+        </h2>
 
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-8">
-            <svg className="animate-spin h-8 w-8 text-indigo-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            <svg
+              className="animate-spin h-8 w-8 text-primary mb-4"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V8a4 4 0 00-4 4H4z"
+              ></path>{" "}
+              {/* Corrected path for better spinner visual */}
             </svg>
-            <span className="text-gray-300">Exportation en cours...</span>
+            <span className="text-muted-foreground">
+              Exportation en cours...
+            </span>
           </div>
-        ) : exportCompleted ? (
+        ) : exportMessage ? ( // Show message if export has been attempted
           <div className="flex flex-col items-center justify-center py-8 space-y-4">
-            {downloadUrl ? (
-              <>
-                <span className="text-green-400">Export terminé !</span>
-                <button
-                  onClick={handleDownload}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors"
-                >
-                  Télécharger le code
-                </button>
-              </>
-            ) : (
-              <span className="text-red-400">Erreur lors de l&apos;exportation.</span>
-            )}
+            {/* Display the message from exportMessage. It could be success or error. */}
+            <span
+              className={`text-center ${
+                exportMessage.startsWith("Erreur")
+                  ? "text-destructive-foreground"
+                  : "text-green-400"
+              }`}
+            >
+              {exportMessage}
+            </span>
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-600 hover:bg-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors"
+              className="px-4 py-2 text-sm font-medium bg-button-secondary-bg text-button-secondary-text hover:bg-button-secondary-hover rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-bg transition-colors"
             >
               Fermer
             </button>
@@ -96,7 +112,10 @@ const ExportCodeModal: React.FC<ExportCodeModalProps> = ({ isOpen, onClose, onEx
           <>
             {/* Language Selection */}
             <div className="mb-4">
-              <label htmlFor="language-select" className="block text-sm font-medium text-gray-300 mb-1">
+              <label
+                htmlFor="language-select"
+                className="block text-sm font-medium text-muted-foreground mb-1"
+              >
                 Langage :
               </label>
               <select
@@ -104,7 +123,7 @@ const ExportCodeModal: React.FC<ExportCodeModalProps> = ({ isOpen, onClose, onEx
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
                 disabled // Only .ino for now
-                className="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-white disabled:opacity-75"
+                className="block w-full px-3 py-2 bg-input-bg border border-input-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm text-foreground disabled:opacity-75"
               >
                 <option value=".ino">.ino (Arduino)</option>
               </select>
@@ -112,29 +131,37 @@ const ExportCodeModal: React.FC<ExportCodeModalProps> = ({ isOpen, onClose, onEx
 
             {/* Code Style Selection */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-300 mb-1">Style du code :</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
+                Style du code :
+              </label>
               <div className="flex flex-col space-y-2">
-                <label htmlFor="style-natural" className="flex items-center space-x-2 text-gray-300 cursor-pointer">
+                <label
+                  htmlFor="style-natural"
+                  className="flex items-center space-x-2 text-muted-foreground cursor-pointer"
+                >
                   <input
                     type="radio"
                     id="style-natural"
                     name="codeStyle"
                     value="natural"
-                    checked={style === 'natural'}
-                    onChange={() => setStyle('natural')}
-                    className="form-radio h-4 w-4 text-indigo-600 bg-gray-700 border-gray-600 focus:ring-indigo-500"
+                    checked={style === "natural"}
+                    onChange={() => setStyle("natural")}
+                    className="form-radio h-4 w-4 text-primary bg-input-bg border-input-border focus:ring-primary"
                   />
                   <span>Code naturel (lisible, commenté)</span>
                 </label>
-                <label htmlFor="style-compressed" className="flex items-center space-x-2 text-gray-300 cursor-pointer">
+                <label
+                  htmlFor="style-compressed"
+                  className="flex items-center space-x-2 text-muted-foreground cursor-pointer"
+                >
                   <input
                     type="radio"
                     id="style-compressed"
                     name="codeStyle"
                     value="compressed"
-                    checked={style === 'compressed'}
-                    onChange={() => setStyle('compressed')}
-                    className="form-radio h-4 w-4 text-indigo-600 bg-gray-700 border-gray-600 focus:ring-indigo-500"
+                    checked={style === "compressed"}
+                    onChange={() => setStyle("compressed")}
+                    className="form-radio h-4 w-4 text-primary bg-input-bg border-input-border focus:ring-primary"
                   />
                   <span>Code compressé (optimisé en taille)</span>
                 </label>
@@ -145,13 +172,13 @@ const ExportCodeModal: React.FC<ExportCodeModalProps> = ({ isOpen, onClose, onEx
             <div className="flex justify-end space-x-3">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-600 hover:bg-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors"
+                className="px-4 py-2 text-sm font-medium bg-button-secondary-bg text-button-secondary-text hover:bg-button-secondary-hover rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-bg transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleExportClick}
-                className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors"
+                className="px-4 py-2 text-sm font-medium bg-button-primary-bg text-button-primary-text hover:bg-button-primary-hover rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-bg transition-colors"
               >
                 Exporter
               </button>

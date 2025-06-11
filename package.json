@@ -12,7 +12,10 @@
     "autoprefixer": "^10.4.21",
     "next": "15.3.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "stk500": "^2.0.3",
+    "stk500-esm": "^1.4.3",
+    "stk500-v2": "^1.0.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

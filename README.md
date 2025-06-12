@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+ # 🛠️ Jino - Arduino Flow Builder
 
-## Getting Started
+ Jino is a web-based visual programming environment for Arduino that lets you build, validate, and export Arduino projects using drag-and-drop blocks. It features:
+ - 🌐 Full EN/FR internationalization with language toggle.
+ - 🔄 Advanced `.ino` transpiler with:
+   - Project structure validation ✅
+   - `while`, fixed-count, and foreach loops 🔁
+   - User-defined functions with return types 📝
+   - Proper C++ `std::vector` and static arrays 📚
+ - 📦 Save, Load, and Export code directly from the UI.
 
-First, run the development server:
+ ## 🚀 Quick Start
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+ ```bash
+ npm install
+ npm run dev
+ ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ Open the app at [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+ ## 🧰 Key Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+ - 🔄 Drag-and-drop block-based code building.
+ - 🛠️ Real-time validation and error reporting.
+ - 📑 Comprehensive documentation in the **Docs** sidebar.
 
-## Learn More
+ ## 📚 Documentation
 
-To learn more about Next.js, take a look at the following resources:
+ Access detailed block references and tutorials in the **Docs** section of the app.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+ ## ❤️ Contributing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+ Pull requests and feedback are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for more info.
 
-## Deploy on Vercel
+ ---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+ _Built with ❤️ by LMC Group_

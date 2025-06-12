@@ -5,6 +5,13 @@ import componentsFr from '@/components/layout/sidebar/build/components.fr.json';
 export interface ComponentItem {
   id: string;
   name: string;
+  defaultPorts: {
+    executionIn?: { portId: string; name: string; dataType: string };
+    executionOuts?: { portId: string; name: string; dataType: string }[];
+    dataIns?: { portId: string; name: string; dataType: string }[];
+    dataOuts?: { portId: string; name: string; dataType: string }[];
+  };
+  documentation?: string;
 }
 
 export interface ComponentsCategory {

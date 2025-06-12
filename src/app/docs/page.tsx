@@ -1,28 +1,30 @@
 "use client";
 import React from 'react';
-import rawComponents from '@/components/layout/sidebar/build/components.json';
+// import rawComponents from '@/components/layout/sidebar/build/components.json';
 import { useLanguage } from '@/context/LanguageContext';
+import { getComponentsData } from '@/utils/getComponentsData';
 
 // Define types for documentation data
-type PortDef = { portId: string; name: string; dataType: string; };
-type DefaultPorts = {
-  executionIn?: PortDef;
-  executionOuts?: PortDef[];
-  dataIns?: PortDef[];
-  dataOuts?: PortDef[];
-};
-type ComponentItem = { id: string; name: string; documentation?: string; defaultPorts: DefaultPorts; };
-type DocsData = { category: string; items: ComponentItem[] }[];
-const componentsData = (rawComponents as unknown) as DocsData;
+// type PortDef = { portId: string; name: string; dataType: string; };
+// type DefaultPorts = {
+//   executionIn?: PortDef;
+//   executionOuts?: PortDef[];
+//   dataIns?: PortDef[];
+//   dataOuts?: PortDef[];
+// };
+// type ComponentItem = { id: string; name: string; documentation?: string; defaultPorts: DefaultPorts; };
+// type DocsData = { category: string; items: ComponentItem[] }[];
+// const componentsData = (rawComponents as unknown) as DocsData;
 
 export default function DocsPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const categorizedComponents = getComponentsData(lang);
   return (
     <div className="min-h-screen bg-background text-foreground flex">
       {/* Sidebar */}
       <aside className="w-64 sticky top-16 h-screen overflow-y-auto bg-muted-bg border-r border-card-border p-4">
         <h2 className="text-xl font-semibold mb-4">{t('docs.sidebarTitle')}</h2>
-        {componentsData.map((category) => (
+        {categorizedComponents.map((category) => (
           <div key={category.category} className="mb-6">
             <h3 className="font-medium mb-2">{category.category}</h3>
             <ul className="pl-2 space-y-1 text-sm">
@@ -43,7 +45,7 @@ export default function DocsPage() {
       {/* Content */}
       <div className="flex-1 p-8 overflow-y-auto">
         <h1 className="text-4xl font-bold mb-8">{t('docs.title')}</h1>
-        {componentsData.map((category) => (
+        {categorizedComponents.map((category) => (
           <section key={category.category} className="mb-12">
             <h2 className="text-2xl font-semibold mb-4">{category.category}</h2>
             <div className="space-y-8">

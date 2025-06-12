@@ -6,7 +6,11 @@
     "home": "Home",
     "builder": "Builder",
     "docs": "Docs",
-    "github": "GitHub"
+    "github": "GitHub",
+    "save": "Save",
+    "load": "Load",
+    "export": "Export Code",
+    "site": "Site"
   },
   "hero": {
     "title": "Jino",

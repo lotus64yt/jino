@@ -355,7 +355,7 @@ const DropZone = forwardRef<DropZoneHandle, DropZoneProps>(({ components: sideba
             id: `func-${instanceId}`,
             name: funcConfig.name || 'maFonction',
             parameters: funcConfig.params || [],
-            returnType: funcConfig.returnType || undefined,
+            // returnType: funcConfig.returnType || undefined, // Removed because FunctionDefinitionConfigData has no returnType
             startBlockInstanceId: instanceId,
           };
           if (existingFuncIndex > -1) {

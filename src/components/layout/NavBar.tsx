@@ -27,7 +27,7 @@ const NavBar: React.FC<NavBarProps> = ({
   loadProjectData,
 }) => {
   // const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
-  const { lang, setLang } = useLanguage();
+  const { lang, t, setLang } = useLanguage();
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [currentProjectName, setCurrentProjectName] = useState<string | null>(
     null
@@ -207,10 +207,10 @@ const NavBar: React.FC<NavBarProps> = ({
             onClick={handleSaveProject}
             className="px-4 py-2 rounded-md text-sm font-medium bg-button-primary-bg text-button-primary-text hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg"
           >
-            Sauvegarder
+            {t('nav.save')}
           </button>
           <label className="px-4 py-2 rounded-md text-sm font-medium bg-input-bg text-foreground hover:bg-input-bg/80 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg cursor-pointer">
-            Charger
+            {t('nav.load')}
             <input
               type="file"
               accept=".jino"
@@ -227,7 +227,7 @@ const NavBar: React.FC<NavBarProps> = ({
                 type="button"
                 className="px-4 py-2 bg-button-secondary-bg text-button-secondary-text hover:bg-secondary/80 font-medium rounded-l-md text-sm focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-background transition-colors"
               >
-                Exporter Code
+                {t('nav.export')}
               </button>
               {/* <button
                 onClick={() => setIsExportDropdownOpen(!isExportDropdownOpen)}
@@ -267,7 +267,7 @@ const NavBar: React.FC<NavBarProps> = ({
             href="/site"
             className="px-4 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-150 ease-in-out"
           >
-            Accueil Site
+            {t('nav.site')}
           </Link>
           {/* Language Switcher */}
           <div className="flex items-center space-x-1">

@@ -2,8 +2,11 @@
 "use client";
 
 import React, { useState } from "react";
+import { useLanguage } from '@/context/LanguageContext';
 import Link from "next/link";
 import { JINO_APP_VERSION, JinoProject } from "@/types/project";
+// Validate project structure before export
+import { validateProjectStructure } from '@/lib/transpiler/arduino_ino_transpiler';
 import { transpileProject } from "@/lib/transpiler/transpiler_registry";
 import ExportCodeModal from "../modals/ExportCodeModal";
 import ArduinoUploader from "../upload/ArduinoUploader"; // Import the new uploader component
@@ -24,6 +27,7 @@ const NavBar: React.FC<NavBarProps> = ({
   loadProjectData,
 }) => {
   // const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
+  const { lang, setLang } = useLanguage();
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [currentProjectName, setCurrentProjectName] = useState<string | null>(
     null
@@ -136,6 +140,13 @@ const NavBar: React.FC<NavBarProps> = ({
         fileExtension.startsWith(".") ? fileExtension : `.${fileExtension}`
       ) as SupportedLanguage;
 
+      // Vérification de la structure du projet avant export
+      const validationErrors = validateProjectStructure(projectForTranspilation);
+      if (validationErrors.length > 0) {
+        console.error('Validation errors before export:', validationErrors);
+        alert('Erreurs détectées dans le projet :\n' + validationErrors.join('\n'));
+        return null;
+      }
       const code = transpileProject(
         projectForTranspilation,
         languageForTranspiler,
@@ -184,6 +195,11 @@ const NavBar: React.FC<NavBarProps> = ({
           >
             Jino Builder
           </Link>
+          {/* Language Switcher */}
+          {/* <div className="flex items-center space-x-1">
+            <button onClick={() => setLang('en')} className={`px-2 ${lang === 'en' ? 'font-bold' : ''}`}>EN</button>
+            <button onClick={() => setLang('fr')} className={`px-2 ${lang === 'fr' ? 'font-bold' : ''}`}>FR</button>
+          </div> */}
           {/* Future: Add logo <img src="/logo.svg" alt="Jino Logo" className="h-8 w-auto ml-2" /> */}
         </div>
         <div className="flex items-center space-x-3">
@@ -253,6 +269,21 @@ const NavBar: React.FC<NavBarProps> = ({
           >
             Accueil Site
           </Link>
+          {/* Language Switcher */}
+          <div className="flex items-center space-x-1">
+            <button
+              onClick={() => setLang('en')}
+              className={`px-2 ${lang === 'en' ? 'font-bold text-primary' : 'text-gray-300'}`}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => setLang('fr')}
+              className={`px-2 ${lang === 'fr' ? 'font-bold text-primary' : 'text-gray-300'}`}
+            >
+              FR
+            </button>
+          </div>
         </div>
       </nav>
       <ExportCodeModal

@@ -16,6 +16,8 @@ import ConstantArrayConfig, { ConstantArrayConfigData } from './configs/Constant
 import VariableNameConfig, { VariableNameConfigData } from './configs/VariableNameConfig'; // Import VariableNameConfigData
 import FunctionDefinitionConfig, { FunctionDefinitionConfigData, FunctionParameter } from './configs/FunctionDefinitionConfig';
 import LogicOperationConfig, { LogicOperationConfigData } from './configs/LogicOperationConfig';
+import { useLanguage } from '@/context/LanguageContext';
+import { getComponentsData } from '@/utils/getComponentsData';
 
 // Define BlockConfigData union type earlier so it can be used by ComponentProps
 export type BlockConfigData =
@@ -130,6 +132,7 @@ export interface DefinedFunction {
   id: string; // Unique ID for the function definition, e.g., derived from instanceId of start block
   name: string;
   parameters: FunctionParameter[]; // Use FunctionParameter here
+  returnType?: string; // Optional return type for function
   startBlockInstanceId: string; // Instance ID of the function_definition_start block
 }
 
@@ -175,6 +178,9 @@ const DropZone = forwardRef<DropZoneHandle, DropZoneProps>(({ components: sideba
   const [draggingBlockInstanceId, setDraggingBlockInstanceId] = useState<string | null>(null);
   const [dragStartOffset, setDragStartOffset] = useState({ x: 0, y: 0 });
   const [definedVariables, setDefinedVariables] = useState<VariableNameConfigData[]>([]); // State for defined variables
+
+  const { lang } = useLanguage();
+  const categorizedComponents = getComponentsData(lang);
 
   useImperativeHandle(ref, () => ({
     getProjectState: () => ({
@@ -345,10 +351,11 @@ const DropZone = forwardRef<DropZoneHandle, DropZoneProps>(({ components: sideba
       if (funcConfig) {
         setDefinedFunctions(prevFuncs => {
           const existingFuncIndex = prevFuncs.findIndex(f => f.startBlockInstanceId === instanceId);
-          const updatedFunc = {
+          const updatedFunc: DefinedFunction = {
             id: `func-${instanceId}`,
             name: funcConfig.name || 'maFonction',
             parameters: funcConfig.params || [],
+            returnType: funcConfig.returnType || undefined,
             startBlockInstanceId: instanceId,
           };
           if (existingFuncIndex > -1) {
@@ -873,6 +880,7 @@ const DropZone = forwardRef<DropZoneHandle, DropZoneProps>(({ components: sideba
           style={{ transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`, transformOrigin: '0 0', width: '10000px', height: '10000px', position: 'absolute' }}
         >
           {droppedComponents.map((comp) => (
+            
             <div
               key={comp.instanceId}
               style={{
@@ -889,7 +897,12 @@ const DropZone = forwardRef<DropZoneHandle, DropZoneProps>(({ components: sideba
                 key={`gb-${comp.instanceId}`}
                 blockId={comp.id}
                 instanceId={comp.instanceId}
-                name={comp.name}
+                name={
+                  categorizedComponents
+                    .flatMap(cat => cat.items)
+                    .find(item => item.id === comp.id)?.name
+                  || comp.name
+                }
                 config={comp.config as BlockConfig | undefined} 
                 executionIn={comp.ports.executionIn}
                 executionOuts={comp.ports.executionOuts}

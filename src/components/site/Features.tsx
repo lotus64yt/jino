@@ -1,4 +1,6 @@
+"use client";
 import React from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const FeatureItem = ({ title, description, Icon }: { title: string; description: string; Icon: React.FC<{ className?: string }>; }) => (
   <div className="flex flex-col items-center text-center p-4 bg-card-bg rounded-lg shadow-md hover:shadow-lg transition transform hover:scale-105">
@@ -32,22 +34,23 @@ const UploadIcon: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 export default function Features() {
+  const { t } = useLanguage();
   return (
     <section className="py-20 px-4 bg-background text-foreground">
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         <FeatureItem
-          title="Visual Programming"
-          description="Build your logic with intuitive drag-and-drop blocks."
+          title={t('features.visualProgramming')}
+          description={t('features.visualProgrammingDesc')}
           Icon={BlocksIcon}
         />
         <FeatureItem
-          title="Code Generation"
-          description="Export clean Arduino code with one click."
+          title={t('features.codeGeneration')}
+          description={t('features.codeGenerationDesc')}
           Icon={CodeIcon}
         />
         <FeatureItem
-          title="Seamless Upload"
-          description="Upload directly to your Arduino board right from the browser. (Feature in development)"
+          title={t('features.seamlessUpload')}
+          description={t('features.seamlessUploadDesc')}
           Icon={UploadIcon}
         />
       </div>

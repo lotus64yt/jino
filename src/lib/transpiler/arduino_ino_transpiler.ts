@@ -55,23 +55,56 @@ export function validateProjectStructure(project: JinoProject): string[] {
   const endBlockIds = ['program_setup_end', 'program_loop_end'];
 
   function pathLeadsToEnd(blockId: string, visited: Set<string>): boolean {
-    if (visited.has(blockId)) return false; // boucle
+    console.log(`[validateProjectStructure] Checking path from blockId: ${blockId}, visited:`, Array.from(visited));
+    if (visited.has(blockId)) {
+      console.log(`[validateProjectStructure] Detected cycle at blockId: ${blockId}`);
+      return false; // boucle
+    }
     visited.add(blockId);
     const block = project.droppedComponents.find(b => b.instanceId === blockId);
-    if (!block) return false;
-    if (endBlockIds.includes(block.id)) return true;
+    if (!block) {
+      console.log(`[validateProjectStructure] Block not found for blockId: ${blockId}`);
+      return false;
+    }
+    if (endBlockIds.includes(block.id)) {
+      console.log(`[validateProjectStructure] Found end block: ${block.id} (${blockId})`);
+      return true;
+    }
     // Trouver les sorties d'exécution
-    const execOutPorts = Array.isArray(block.ports) ? block.ports.filter(p => p.kind === 'execution' && p.flow === 'out') : [];
-    if (execOutPorts.length === 0) return false;
+    // Find all execution out ports for the block, supporting both array and object forms
+    let execOutPorts: { id: string; kind: string; flow: string }[] = [];
+    if (Array.isArray(block.ports)) {
+      execOutPorts = block.ports.filter(p => p.kind === 'execution' && p.flow === 'out');
+    } else if (
+      typeof block.ports === 'object' &&
+      block.ports !== null &&
+      Array.isArray((block.ports as { executionOuts?: { id: string; kind: string; flow: string }[] }).executionOuts)
+    ) {
+      execOutPorts = ((block.ports as { executionOuts: { id: string; kind: string; flow: string }[] }).executionOuts)
+        .filter((p: { id: string; kind: string; flow: string }) => p.kind === 'execution' && p.flow === 'out');
+    }
+    if (execOutPorts.length === 0) {
+      console.log(`[validateProjectStructure] No execution out ports for blockId: ${blockId}`);
+      return false;
+    }
+    let foundPath = false;
     for (const port of execOutPorts) {
       const next = project.connections.find(c => c.fromBlockInstanceId === blockId && c.fromPortId === port.id);
       if (next) {
-        if (pathLeadsToEnd(next.toBlockInstanceId, new Set(visited))) return true;
+        console.log(`[validateProjectStructure] Following execution from ${blockId} (port ${port.id}) to ${next.toBlockInstanceId}`);
+        // On passe le même ensemble visited pour suivre le chemin courant
+        if (pathLeadsToEnd(next.toBlockInstanceId, visited)) {
+          foundPath = true;
+          break;
+        }
+      } else {
+        console.log(`[validateProjectStructure] No connection found from ${blockId} (port ${port.id})`);
       }
     }
-    return false;
+    return foundPath;
   }
   for (const start of startBlocks) {
+    console.log(`[validateProjectStructure] Checking start block: ${start.instanceId} (${start.name || start.id})`);
     if (!pathLeadsToEnd(start.instanceId, new Set())) {
       errors.push(`Le chemin depuis le bloc de début (${start.name || start.id}) n'atteint pas de bloc de fin (Fin Setup ou Fin Loop).`);
     }
@@ -80,6 +113,7 @@ export function validateProjectStructure(project: JinoProject): string[] {
   return errors;
 }
 import { JinoProject, DroppedComponent/*, Connection*/ } from '@/types/project'; // Adjusted imports
+import { FunctionDefinitionConfigData } from '@/components/build/configs/FunctionDefinitionConfig'; // For function params
 import { VariableNameConfigData } from '@/components/build/configs/VariableNameConfig'; // For variable types
 
 export interface TranspilationOptions {
@@ -217,6 +251,13 @@ function getInputValueCode(
       return `analogRead(${analogPin})`;
     case 'get_time':
       return `millis()`;
+    // Use function parameter value when inside a function definition
+    case 'function_definition_start': {
+      const params = (sourceBlock.config as FunctionDefinitionConfigData).params;
+      const param = params?.find(p => p.id === sourcePortId);
+      if (param?.name) return param.name;
+      return `/* unconfigured_function_param_${sourcePortId} */`;
+    }
     default:
       return `/* val_from_${sourceBlock.id}.${sourcePortId} */`; // Changed from sourceBlock.componentId to sourceBlock.id
   }
@@ -389,6 +430,19 @@ function transpileExecutionSequence(
         blockSpecificCodeGenerated = true;
         break;
       }
+      // Repeat X times loop
+      case 'loop_fixed': {
+        // iterations input drives loop count
+        const count = getInputValueCode(project, currentBlock.instanceId, 'iterations', options);
+        const loopVar = `i_${currentBlock.instanceId.replaceAll("-", "_")}`; // Unique loop variable name
+        sequenceCode += `${indentation}for(int ${loopVar} = 0; ${loopVar} < ${count}; ${loopVar}++) {\n`;
+        const bodyStart = findNextExecutionBlock(project, currentBlock.instanceId, 'exec_out_loop');
+        sequenceCode += transpileExecutionSequence(project, bodyStart, options, indentation + '  ');
+        sequenceCode += `${indentation}}\n`;
+        currentBlock = findNextExecutionBlock(project, currentBlock.instanceId, 'exec_out_end');
+        blockSpecificCodeGenerated = true;
+        break;
+      }
       case 'for_loop': {
         // Suppose config: { varName: string, from: number, to: number, step: number }
         const config = findBlockById(project, currentBlock.instanceId)?.config as { varName?: string, from?: number, to?: number, step?: number };
@@ -428,11 +482,35 @@ function transpileExecutionSequence(
         }
         break;
       }
-      default:
-        if (options.style === 'natural') {
-          sequenceCode += `${indentation}// TODO: Transpile block type: ${currentBlock.id}\n`;
+      case 'loop_array_foreach': {
+        // For-each array iteration
+        const arrCode = getInputValueCode(project, currentBlock.instanceId, 'array_in', options);
+        const elemVar = `element_${currentBlock.instanceId.replaceAll('-', '_')}`;
+        sequenceCode += `${indentation}for (auto & ${elemVar} : ${arrCode}) {\n`;
+        const bodyStart = findNextExecutionBlock(project, currentBlock.instanceId, 'exec_out_loop');
+        sequenceCode += transpileExecutionSequence(project, bodyStart, options, indentation + '  ');
+        sequenceCode += `${indentation}}\n`;
+        currentBlock = findNextExecutionBlock(project, currentBlock.instanceId, 'exec_out_end');
+        blockSpecificCodeGenerated = true;
+        break;
+      }
+      default: {
+        // Handle dynamic function call blocks: id = call_func_<funcId>
+        // Dynamic function call blocks: id = call_func_<funcInstanceId>
+        const block = currentBlock!;
+        if (block.id.startsWith('call_func_')) {
+          const funcId = block.id.replace('call_func_', '');
+          const funcDef = project.definedFunctions.find(f => f.id === funcId);
+          const funcName = funcDef?.name || `/* unknown_fn_${funcId} */`;
+          // collect data input ports (function args)
+          const args = (block.ports.dataIns || [])
+            .map(p => getInputValueCode(project, block.instanceId, p.id, options));
+          sequenceCode += `${indentation}${funcName}(${args.join(', ')});\n`;
+        } else if (options.style === 'natural') {
+          sequenceCode += `${indentation}// Unhandled block: ${block.id} (ID: ${block.instanceId})\n`;
         }
         break;
+      }
     }
 
     if (blockSpecificCodeGenerated) {
@@ -499,9 +577,13 @@ export function transpileToArduinoIno(
     inoCode += `// Project: ${project.projectName || 'Mon Projet Jino'}\n`;
     inoCode += `// Exported on: ${new Date().toISOString()}\n`;
     inoCode += `// Jino Version: ${project.jinoVersion}\n`;
-    inoCode += `// Transpiler: arduino_ino_transpiler.ts\n`;
     inoCode += `// Style: ${options.style}\n`;
     inoCode += '\n';
+  }
+  // Include vector header if arrays are used
+  const hasArrayVars = project.definedVariables?.some(v => v.dataType === 'Tableau');
+  if (hasArrayVars) {
+    inoCode += '#include <vector>\n\n';
   }
 
   // 1. Global Variable Declarations
@@ -514,16 +596,19 @@ export function transpileToArduinoIno(
       case 'Nombre': type = 'float'; break;
       case 'Texte': type = 'String'; break;
       case 'Booléen': type = 'boolean'; break;
-      case 'Tableau': // Array declaration in C++ needs type and often size.
-                      // Jino\'s \'Tableau\' is generic. This needs more info.
-                      // Example: float myArray[10]; or String myStrings[];
-        type = `/* TODO: Array type for ${variable.name} (e.g., float[], String[]) */ auto`; // auto might not work globally
-        if (options.style === 'natural') {
-            inoCode += `// TODO: Define array type and potentially size for ${variable.name} of type ${variable.arrayElementType || 'unknown'}\n`; // Used arrayElementType
-        }
-        // For now, skip adding incomplete array declarations globally, needs better handling
-        inoCode += `// Global array ${variable.name} of ${variable.arrayElementType || 'unknown'} needs proper declaration (e.g., with size or as a class wrapper)\n`;
-        return; // Skip adding incomplete declaration for now
+      case 'Tableau': {
+        // Declare as std::vector of the element type
+        const cppElemType = (() => {
+          switch (variable.arrayElementType) {
+            case 'Nombre': return 'float';
+            case 'Texte': return 'String';
+            case 'Booléen': return 'bool';
+            default: return 'auto';
+          }
+        })();
+        type = `std::vector<${cppElemType}>`;
+        break;
+      }
       default: type = 'void';
     }
     inoCode += `${type} ${variable.name};\n`;
@@ -533,14 +618,26 @@ export function transpileToArduinoIno(
   }
 
   // 2. Function Definitions (User-defined functions from Jino)
-  // TODO: Implement transpilation of Jino function definitions
-  // This would involve finding 'function_definition_start' blocks,
-  // generating C++ function signatures based on their config (name, params, return type),
-  // and then transpiling their execution sequence.
-  if (options.style === 'natural') {
-    inoCode += '// User-Defined Function Definitions (if any)\n';
-    inoCode += '// TODO: Implement Jino function transpilation\n';
-    inoCode += '\n';
+  if (project.definedFunctions && project.definedFunctions.length > 0) {
+    inoCode += '// User-Defined Functions\n';
+    // Map Jino parameter types to C++ types
+    const mapParamType = (dt: string) => {
+      switch (dt) {
+        case 'number': return 'float';
+        case 'string': return 'String';
+        case 'boolean': return 'bool';
+        default: return 'auto';
+      }
+    };
+    project.definedFunctions.forEach(func => {
+      // Determine return type, default void
+      const returnTypeCpp = func.returnType ? mapParamType(func.returnType) : 'void';
+      const paramsList = func.parameters?.map(p => `${mapParamType(p.dataType)} ${p.name}`).join(', ') || '';
+      inoCode += `${returnTypeCpp} ${func.name}(${paramsList}) {\n`;
+      const bodyStart = findNextExecutionBlock(project, func.startBlockInstanceId, 'exec_out_body');
+      inoCode += transpileExecutionSequence(project, bodyStart, options, '  ');
+      inoCode += '}\n\n';
+    });
   }
   
   const collectedPinModes = collectPinModes(project, options);

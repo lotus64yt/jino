@@ -1,0 +1,33 @@
+{
+  "sidebar": {
+    "title": "Jino Composants"
+  },
+  "nav": {
+    "home": "Accueil",
+    "builder": "Constructeur",
+    "docs": "Docs",
+    "github": "GitHub"
+  },
+  "hero": {
+    "title": "Jino",
+    "subtitle": "Outil de programmation visuelle pour Arduino. Construisez, connectez et téléversez votre code facilement.",
+    "getStarted": "Commencer"
+  },
+  "features": {
+    "visualProgramming": "Programmation Visuelle",
+    "visualProgrammingDesc": "Construisez votre logique avec des blocs glisser-déposer intuitifs.",
+    "codeGeneration": "Génération de Code",
+    "codeGenerationDesc": "Générez un code Arduino propre en un clic.",
+    "seamlessUpload": "Téléversement Transparent",
+    "seamlessUploadDesc": "Téléversez directement sur votre carte Arduino depuis le navigateur. (Fonction en développement)"
+  }
+  ,"about": {
+    "title": "À propos de Jino",
+    "paragraph1": "Jino est un environnement de programmation visuelle conçu pour les cartes Arduino. Utilisez des blocs glisser-déposer pour assembler la logique, configurer les composants facilement et déployer votre sketch en un seul clic.",
+    "paragraph2": "Conçu pour les débutants et les développeurs expérimentés, Jino rationalise votre flux de travail, vous permettant de vous concentrer sur la créativité plutôt que sur le code standard."
+  },
+  "docs": {
+    "title": "Documentation des composants Jino",
+    "sidebarTitle": "Composants"
+  }
+}

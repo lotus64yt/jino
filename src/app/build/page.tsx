@@ -1,10 +1,11 @@
 "use client";
 
 import Sidebar from '@/components/layout/sidebar/build/Sidebar';
-import DropZone, { ComponentProps, DefinedFunction/*, Connection, DroppedComponent*/, DropZoneHandle } from '@/components/build/DropZone'; // Import DropZoneHandle
+import DropZone, { ComponentProps, DefinedFunction/*, Connection, DroppedComponent*/, DropZoneHandle } from '@/components/build/DropZone';
 import { Port } from '@/components/build/GenericBlock';
 import React, { useState/*, useEffect*/, useRef } from 'react'; // Added useState, useEffect, useRef
-import componentsData from '@/components/layout/sidebar/build/components.json';
+import { getComponentsData } from '@/utils/getComponentsData';
+import { useLanguage } from '@/context/LanguageContext';
 import NavBar from '@/components/layout/NavBar'; // Import NavBar
 import { JinoProject/*, JINO_APP_VERSION*/ } from '@/types/project'; // Import JinoProject and JINO_APP_VERSION
 
@@ -69,7 +70,9 @@ const mapPort = (port: RawPortData): Port | undefined => {
 };
 
 const BuildPage = () => {
-  const typedComponentsData = componentsData as RawCategory[];
+  const { lang, t } = useLanguage();
+  // Select localized components metadata based on current language
+  const typedComponentsData = getComponentsData(lang) as RawCategory[];
   const [definedFunctions, setDefinedFunctions] = useState<DefinedFunction[]>([]);
   const dropZoneRef = useRef<DropZoneHandle>(null); // Use DropZoneHandle here
 
@@ -110,12 +113,13 @@ const BuildPage = () => {
   };
 
   const allComponents: ComponentProps[] = typedComponentsData.reduce<ComponentProps[]>((acc, category) => {
-    const categoryItems = category.items.map((item: RawComponentItem) => {
+      const categoryItems = category.items.map((item: RawComponentItem) => {
       const defaultPorts = item.defaultPorts;
-
+      // Localize name via translations (fallback to JSON name)
+      const translatedName = t(`components.${item.id}.name`) || item.name;
       const mappedItem: ComponentProps = {
         id: item.id,
-        name: item.name,
+        name: translatedName,
         defaultPorts: {
           executionIn: defaultPorts?.executionIn ? mapPort(defaultPorts.executionIn) : undefined,
           executionOuts: defaultPorts?.executionOuts?.map(mapPort).filter((p): p is Port => p !== undefined),

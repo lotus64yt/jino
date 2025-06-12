@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { BgBlueRing } from "@/components/ui/background/BlueRing";
+import { LanguageProvider } from '@/context/LanguageContext';
 import React from "react";
 
 const geistSans = Geist({
@@ -30,8 +31,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <BgBlueRing />
-        {children}
+        <LanguageProvider>
+          <BgBlueRing />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -10,6 +10,7 @@ import { validateProjectStructure } from '@/lib/transpiler/arduino_ino_transpile
 import { transpileProject } from "@/lib/transpiler/transpiler_registry";
 import ExportCodeModal from "../modals/ExportCodeModal";
 import ArduinoUploader from "../upload/ArduinoUploader"; // Import the new uploader component
+import { getSubdomainUrl } from "@/utils/getSubdomainUrl";
 
 // Props for NavBar if it needs to access project data directly or via context
 interface NavBarProps {
@@ -185,12 +186,13 @@ const NavBar: React.FC<NavBarProps> = ({
     setTriggerUpload(false); // Reset trigger when upload is done (or modal closed)
   };
 
+
   return (
     <>
       <nav className="bg-background/80 backdrop-blur-md text-foreground p-3 shadow-lg flex justify-between items-center h-16 z-50 relative transition-all">
         <div className="flex items-center">
           <Link
-            href="/build"
+            href={getSubdomainUrl('build')}
             className="text-2xl font-bold hover:text-primary transition duration-150 ease-in-out transform hover:scale-105"
           >
             Jino Builder
@@ -264,7 +266,7 @@ const NavBar: React.FC<NavBarProps> = ({
           </div>
 
           <Link
-            href="/site"
+            href={getSubdomainUrl("", window)}
             className="px-4 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-150 ease-in-out"
           >
             {t('nav.site')}

@@ -89,73 +89,53 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // Redirect /docs
+      // Redirect local /docs to docs.localhost:3000
       {
-        source: "/docs",
-        destination: "http://docs.localhost:3000",
-        has: [
-          {
-            type: "host",
-            value: "localhost",
-          },
-        ],
+        source: '/docs/:path*',
+        has: [{ type: 'host', value: 'localhost' }],
+        destination: 'http://docs.localhost:3000',
         permanent: false,
       },
+      // Redirect any /docs or /docs/* to docs.jino.lmcgroup.xyz
       {
-        source: "/docs",
-        destination: "https://docs.jino.lmcgroup.xyz",
-        has: [
-          {
-            type: "host",
-            value: "jino.lmcgroup.xyz",
-          },
-        ],
+        source: '/docs/:path*',
+        has: [{ type: 'host', value: 'jino.lmcgroup.xyz' }],
+        destination: 'https://docs.jino.lmcgroup.xyz',
         permanent: false,
       },
-      // Redirect /build
+      // Redirect local /build to build.localhost:3000
       {
-        source: "/build",
-        destination: "http://build.localhost:3000",
-        has: [
-          {
-            type: "host",
-            value: "localhost",
-          },
-        ],
+        source: '/build/:path*',
+        has: [{ type: 'host', value: 'localhost' }],
+        destination: 'http://build.localhost:3000',
         permanent: false,
       },
+      // Redirect any /build or /build/* to build.jino.lmcgroup.xyz
       {
-        source: "/build",
-        destination: "https://build.jino.lmcgroup.xyz",
-        has: [
-          {
-            type: "host",
-            value: "jino.lmcgroup.xyz",
-          },
-        ],
+        source: '/build/:path*',
+        has: [{ type: 'host', value: 'jino.lmcgroup.xyz' }],
+        destination: 'https://build.jino.lmcgroup.xyz',
         permanent: false,
       },
-      // Redirect /site
+      // Redirect /site on any subdomain.localhost back to main localhost
       {
-        source: "/site",
-        destination: "http://localhost:3000",
-        has: [
-          {
-            type: "host",
-            value: "localhost",
-          },
-        ],
+        source: '/site/:path*',
+        has: [{ type: 'host', value: ':subdomain.localhost' }],
+        destination: 'http://localhost:3000',
         permanent: false,
       },
+      // Redirect /site on main localhost to site.localhost:3000
       {
-        source: "/site",
-        destination: "https://site.jino.lmcgroup.xyz",
-        has: [
-          {
-            type: "host",
-            value: "jino.lmcgroup.xyz",
-          },
-        ],
+        source: '/site/:path*',
+        has: [{ type: 'host', value: 'localhost' }],
+        destination: 'http://site.localhost:3000',
+        permanent: false,
+      },
+      // Redirect any /site or /site/* to jino.lmcgroup.xyz
+      {
+        source: '/site/:path*',
+        has: [{ type: 'host', value: 'jino.lmcgroup.xyz' }],
+        destination: 'https://jino.lmcgroup.xyz',
         permanent: false,
       },
     ];

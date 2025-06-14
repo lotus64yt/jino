@@ -3,6 +3,7 @@ import React from 'react';
 // import rawComponents from '@/components/layout/sidebar/build/components.json';
 import { useLanguage } from '@/context/LanguageContext';
 import { getComponentsData } from '@/utils/getComponentsData';
+import { getSubdomainUrl } from '@/utils/getSubdomainUrl';
 
 // Define types for documentation data
 // type PortDef = { portId: string; name: string; dataType: string; };
@@ -31,7 +32,7 @@ export default function DocsPage() {
               {category.items.map((item) => (
                 <li key={item.id}>
                   <a
-                    href={`#${item.id}`}
+                    href={`${getSubdomainUrl("docs")}/#${item.id}`}
                     className="hover:text-primary transition-colors"
                   >
                     {item.name}

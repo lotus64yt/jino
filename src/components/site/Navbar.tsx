@@ -1,6 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
+import { getSubdomainUrl } from '@/utils/getSubdomainUrl';
 
 export default function Navbar() {
   const { lang, setLang, t } = useLanguage();
@@ -9,16 +10,22 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto flex justify-between items-center px-4">
         <h1 className="text-2xl font-bold">Jino</h1>
         <nav className="space-x-4">
-          <Link href="/site" className="hover:text-primary transition">
+          <Link href={
+            getSubdomainUrl("", window) || "/"
+          } className="hover:text-primary transition">
             {t('nav.home')}
           </Link>
-          <Link href="/docs" className="hover:text-primary transition">
+          <Link href={
+            getSubdomainUrl("docs", window) || "/docs"
+          } className="hover:text-primary transition">
             {t('nav.docs')}
           </Link>
-          <Link href="/build" className="hover:text-primary transition">
+          <Link href={
+            getSubdomainUrl("build", window) || "/build"
+          } className="hover:text-primary transition">
             {t('nav.builder')}
           </Link>
-          <a href="https://github.com/your-repo/jino" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition">
+          <a href="https://github.com/lotus64yt/jino" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition">
             {t('nav.github')}
           </a>
         </nav>

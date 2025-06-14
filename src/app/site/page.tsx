@@ -15,7 +15,7 @@ export default function SitePage() {
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p>© {new Date().getFullYear()} Jino. All rights reserved.</p>
           <p>
-            Visit our <a href="https://github.com/your-repo/jino" className="text-primary hover:underline">GitHub</a> to contribute.
+            Visit our <a href="https://github.com/lotus64yt/jino" className="text-primary hover:underline">GitHub</a> to contribute.
           </p>
         </div>
       </footer>

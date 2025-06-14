@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import CodeBlocksIllustration from '@/components/ui/illustrations/CodeBlocksIllustration';
 import { useLanguage } from '@/context/LanguageContext';
+import { getSubdomainUrl } from '@/utils/getSubdomainUrl';
 
 export default function Hero() {
   const { t } = useLanguage();
@@ -11,7 +12,7 @@ export default function Hero() {
         <h1 className="text-5xl font-bold mb-4">{t('hero.title')}</h1>
         <p className="text-lg mb-6">{t('hero.subtitle')}</p>
         <Link
-          href="/build"
+          href={getSubdomainUrl("build")}
           className="px-6 py-3 bg-button-primary-bg text-button-primary-text rounded-md hover:bg-button-primary-bg/90 transition transform hover:scale-105"
         >
           {t('hero.getStarted')}

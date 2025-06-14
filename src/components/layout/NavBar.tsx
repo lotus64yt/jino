@@ -266,7 +266,7 @@ const NavBar: React.FC<NavBarProps> = ({
           </div>
 
           <Link
-            href={getSubdomainUrl("", window)}
+            href={getSubdomainUrl("")}
             className="px-4 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-150 ease-in-out"
           >
             {t('nav.site')}
